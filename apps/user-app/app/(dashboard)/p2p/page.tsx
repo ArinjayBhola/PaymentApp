@@ -1,60 +1,56 @@
 import prisma from "@repo/db/prisma";
 import { getServerSession } from "next-auth";
-import { AddMoney } from "../../components/AddMoneyCard";
 import { BalanceCard } from "../../components/BalanceCard";
-import { OnRampTransactions } from "../../components/OnRampTransactions";
+import P2PTransactions from "../../components/P2PTransactions";
+import SendCard from "../../components/SendCard";
 import { authOptions } from "../../lib/auth";
 
-async function getBalance() {
-  const session = await getServerSession(authOptions);
+async function getP2PTransactions() {
   try {
-    const balance = await prisma.balance.findFirst({
+    const session = await getServerSession(authOptions);
+    const transactions = await prisma.p2pTransfer.findMany({
       where: {
-        userId: Number(session?.user?.id),
+        fromUserId: Number(session?.user?.id),
       },
     });
-    return {
-      amount: balance?.amount || 0,
-      locked: balance?.locked || 0,
-    };
+    return transactions;
   } catch (error) {
     console.log(error);
   }
 }
 
-async function getOnRampTransactions() {
-  const session = await getServerSession(authOptions);
-  const transactions = await prisma.onRampTransaction.findMany({
-    where: {
-      userId: Number(session?.user?.id),
-    },
-  });
-  return transactions.map((t) => ({
-    time: t.startTime,
-    amount: t.amount,
-    status: t.status,
-    provider: t.provider,
-  }));
+async function getBalance() {
+  try {
+    const session = await getServerSession(authOptions);
+    const balance = await prisma.balance.findFirst({
+      where: {
+        userId: Number(session?.user?.id),
+      },
+    });
+    return balance;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-export default async function () {
+export default async function P2PTransfer() {
+  const transactions = await getP2PTransactions();
   const balance = await getBalance();
-  const transactions = await getOnRampTransactions();
   return (
     <div className="w-screen">
       <div className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">
-        Transfer
+        P2P Transaction
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 p-4">
         <div>
-          <AddMoney />
+          <SendCard />
         </div>
         <div>
           {balance && (
             <BalanceCard amount={balance.amount} locked={balance.locked} />
           )}
           <div className="pt-4">
-            <OnRampTransactions transactions={transactions} />
+            <P2PTransactions transactions={transactions} />
           </div>
         </div>
       </div>
