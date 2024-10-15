@@ -1,7 +1,6 @@
 import { Card } from "@repo/ui/card";
 
 export default function P2PTransactions({ transactions }: any) {
-  console.log(transactions);
   if (!transactions.length) {
     return (
       <Card title="Recent Transactions">

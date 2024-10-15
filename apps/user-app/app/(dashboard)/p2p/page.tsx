@@ -1,5 +1,6 @@
 import prisma from "@repo/db/prisma";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { BalanceCard } from "../../components/BalanceCard";
 import P2PTransactions from "../../components/P2PTransactions";
 import SendCard from "../../components/SendCard";
@@ -34,6 +35,11 @@ async function getBalance() {
 }
 
 export default async function P2PTransfer() {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/signin");
+  }
+
   const transactions = await getP2PTransactions();
   const balance = await getBalance();
   return (

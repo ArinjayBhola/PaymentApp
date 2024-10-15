@@ -1,5 +1,6 @@
 import prisma from "@repo/db/prisma";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { AddMoney } from "../../components/AddMoneyCard";
 import { BalanceCard } from "../../components/BalanceCard";
 import { OnRampTransactions } from "../../components/OnRampTransactions";
@@ -7,6 +8,7 @@ import { authOptions } from "../../lib/auth";
 
 async function getBalance() {
   const session = await getServerSession(authOptions);
+
   try {
     const balance = await prisma.balance.findFirst({
       where: {
@@ -38,6 +40,11 @@ async function getOnRampTransactions() {
 }
 
 export default async function () {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/signin");
+  }
+
   const balance = await getBalance();
   const transactions = await getOnRampTransactions();
   return (
