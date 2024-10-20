@@ -6,9 +6,7 @@
     "dev": "next dev --turbo --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:generate": "cd packages/db && npx prisma generate && cd ../..",
-    "start-user-app": "cd ./apps/user-app && npm run start"
+    "lint": "next lint"
   },
   "dependencies": {
     "@repo/ui": "*",
